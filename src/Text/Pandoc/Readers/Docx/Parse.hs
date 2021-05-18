@@ -717,15 +717,21 @@ elemToBodyPart ns element
                     levelInfo <- lookupLevel numId lvl <$> asks envNumbering
                     return $ ListItem parstyle numId lvl levelInfo parparts
         _ -> let
-          hasTableField :: Bool
-          hasTableField = fromMaybe False $ do
+          hasCaptionStyle = elem "Caption" (pStyleId <$> pStyle parstyle)
+
+          hasSimpleTableField = fromMaybe False $ do
             fldSimple <- findChildByName ns "w" "fldSimple" element
             instr <- findAttrByName ns "w" "instr" fldSimple
-            pure ("Table" `elem` T.words instr)
+            pure (elem "Table" (T.words instr))
 
-          in if elem "Caption" (pStyleId <$> pStyle parstyle) || hasTableField
+          hasComplexTableField = fromMaybe False $ do
+            instrText <- findElementByName ns "w" "instrText" element
+            pure (elem "Table" (T.words (strContent instrText)))
+
+          in if hasCaptionStyle && (hasSimpleTableField || hasComplexTableField)
              then return $ TblCaption parstyle parparts
              else return $ Paragraph parstyle parparts
+
 elemToBodyPart ns element
   | isElem ns "w" "tbl" element = do
     let tblProperties = findChildByName ns "w" "tblPr" element
