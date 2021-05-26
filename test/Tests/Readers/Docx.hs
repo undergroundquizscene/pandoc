@@ -338,6 +338,10 @@ tests = [ testGroup "document"
             "docx/table_captions_no_field.docx"
             "docx/table_captions_no_field.native"
           , testCompare
+            "tables with captions which contain an ordered list"
+            "docx/table_captions_with_ordered_list.docx"
+            "docx/table_captions_with_ordered_list.native"
+          , testCompare
             "code block"
             "docx/codeblock.docx"
             "docx/codeblock.native"
